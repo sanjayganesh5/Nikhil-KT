@@ -1,0 +1,23 @@
+service: Sample
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.10
+  region: ap-south-1
+  stage: dev
+  memorySize: 128
+  timeout: 900  # landa function timeout
+
+
+functions:
+  serverlessFunction:
+    handler: handler.main
+    logRetentionInDays: 1  # cloudwatch logs
+    url: true  # Defines lambda function should have function url or not
+    environment:
+      APP_ENV: ${self:provider.stage}
+    events:
+      - http:
+          path: nikhil/{resource}/{functionName}
+          method: any
