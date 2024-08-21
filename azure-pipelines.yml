@@ -1,0 +1,46 @@
+name: 1.0.1$(rev:.r)
+
+trigger:
+  - main
+
+pool: Default  # Linux ENv
+
+steps:
+- task: CmdLine@2
+  displayName: 'Print Build Directories'
+  inputs:
+    script: |
+      echo BinariesDirectory: $(Build.BinariesDirectory)
+      echo ArtifactStagingDirectory: $(Build.ArtifactStagingDirectory)  # Application Package
+      echo SourcesDirectory: $(Build.SourcesDirectory)  # Git Repo Code
+
+- task: UsePythonVersion@0
+  displayName: 'Install Python 3.10'
+  inputs:
+    versionSpec: '3.10'
+    addToPath: true
+    architecture: 'x64'
+
+- task: CmdLine@2
+  displayName: 'Install requirements'
+  inputs:
+    workingDirectory: '$(Build.SourcesDirectory)'
+    script: |
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt -t .
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+  displayName: 'Zip Artifact'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'application'
+    publishLocation: 'Container'
+  displayName: 'Publish Artifact'
