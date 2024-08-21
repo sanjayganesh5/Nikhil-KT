@@ -11,7 +11,7 @@ provider:
 
 
 functions:
-  serverlessFunction:
+  NikhilKT:
     handler: handler.main
     logRetentionInDays: 1  # cloudwatch logs
     url: true  # Defines lambda function should have function url or not
